@@ -1,4 +1,7 @@
-// server.js - Viswam Edutech LAN Exam Engine (v6.0)
+/**
+ * Viswam Edutech Exam Engine v10.0 (Final Gold Master)
+ * Features: Proctoring, Bulk Import, Randomization, Security, Analytics
+ */
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -7,124 +10,90 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-// Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Handles large question bank imports
-app.use(express.static(__dirname)); // Serves index.html from the same folder
+app.use(express.json({ limit: '50mb' }));
+app.use(express.static(__dirname));
 
-// Data Directory Setup
+// Ensure Data Directory Exists
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 
+// File Paths
 const FILES = {
     BANK: path.join(DATA_DIR, 'question_bank.json'),
+    PAPERS: path.join(DATA_DIR, 'exam_papers.json'),
+    RESULTS: path.join(DATA_DIR, 'student_results.json'),
     USERS: path.join(DATA_DIR, 'users.json'),
-    RESULTS: path.join(DATA_DIR, 'student_results.json')
+    SESSIONS: path.join(DATA_DIR, 'active_sessions.json')
 };
 
-// Helper Functions
-const readData = (file) => {
-    try {
-        return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)) : [];
-    } catch (err) {
-        console.error(`Error reading ${file}:`, err);
-        return [];
-    }
-};
+// Helper: Read/Write JSON
+const readData = (f) => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [];
+const writeData = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
 
-const writeData = (file, data) => {
-    try {
-        fs.writeFileSync(file, JSON.stringify(data, null, 2));
-    } catch (err) {
-        console.error(`Error writing to ${file}:`, err);
-    }
-};
-
-// --- USER MANAGEMENT API ---
-
-app.get('/api/users', (req, res) => {
-    res.json(readData(FILES.USERS));
-});
-
+// --- 1. USER & AUTH API ---
 app.post('/api/users', (req, res) => {
     const users = readData(FILES.USERS);
-    // Check for duplicate username
-    if (users.find(u => u.username === req.body.username)) {
-        return res.status(400).json({ success: false, msg: "User ID already exists" });
-    }
-    users.push(req.body);
+    if (users.find(u => u.username === req.body.username)) return res.json({ success: false, msg: "User exists" });
+    users.push(req.body); 
     writeData(FILES.USERS, users);
     res.json({ success: true });
 });
-
-// --- QUESTION BANK API ---
-
-app.get('/api/bank', (req, res) => {
-    res.json(readData(FILES.BANK));
-});
-
-// Single Question Add
-app.post('/api/bank', (req, res) => {
-    const bank = readData(FILES.BANK);
-    const newQuestion = {
-        id: Date.now() + Math.random(), // Unique ID generation
-        ...req.body
-    };
-    bank.push(newQuestion);
-    writeData(FILES.BANK, bank);
-    res.json({ success: true, question: newQuestion });
-});
-
-// Bulk Import / Full Update (REPLACES existing data to prevent duplication)
-app.post('/api/bank/bulk', (req, res) => {
-    if (Array.isArray(req.body)) {
-        writeData(FILES.BANK, req.body); // Overwrites the file with the new array
-        res.json({ success: true, count: req.body.length });
-    } else {
-        res.status(400).json({ success: false, msg: "Expected an array of questions" });
-    }
-});
-
-// Specific Delete Route (removes by ID)
-app.delete('/api/bank/:id', (req, res) => {
-    let bank = readData(FILES.BANK);
-    const initialLength = bank.length;
-    
-    // Filter out the specific ID
-    bank = bank.filter(q => q.id.toString() !== req.params.id.toString());
-    
-    if (bank.length === initialLength) {
-        return res.status(404).json({ success: false, msg: "Question not found" });
-    }
-
-    writeData(FILES.BANK, bank);
-    res.json({ success: true, msg: "Question deleted" });
-});
-
-// --- EXAM RESULTS API ---
-
-app.get('/api/results', (req, res) => {
-    res.json(readData(FILES.RESULTS));
-});
-
-app.post('/api/submit', (req, res) => {
-    const results = readData(FILES.RESULTS);
-    const submission = {
-        id: Date.now(),
-        timestamp: new Date().toLocaleString(),
-        ...req.body
-    };
-    results.push(submission);
-    writeData(FILES.RESULTS, results);
+app.get('/api/users', (req, res) => res.json(readData(FILES.USERS)));
+app.delete('/api/users/:id', (req, res) => {
+    writeData(FILES.USERS, readData(FILES.USERS).filter(u => u.username !== req.params.id));
     res.json({ success: true });
 });
 
-// Start the server
+// --- 2. LIVE PROCTORING API ---
+app.post('/api/proctor/heartbeat', (req, res) => {
+    let sessions = readData(FILES.SESSIONS);
+    const idx = sessions.findIndex(s => s.username === req.body.username);
+    const entry = { ...req.body, lastSeen: Date.now() };
+    if (idx > -1) sessions[idx] = entry; else sessions.push(entry);
+    writeData(FILES.SESSIONS, sessions);
+    res.json({ success: true });
+});
+app.get('/api/proctor/sessions', (req, res) => {
+    // Return sessions active in last 60 seconds
+    res.json(readData(FILES.SESSIONS).filter(s => Date.now() - s.lastSeen < 60000));
+});
+
+// --- 3. QUESTION BANK & BULK IMPORT ---
+app.post('/api/bank/bulk', (req, res) => {
+    const bank = readData(FILES.BANK);
+    // Assign unique IDs to new questions
+    const newQs = req.body.map(q => ({ id: Date.now() + Math.random(), ...q }));
+    writeData(FILES.BANK, [...bank, ...newQs]);
+    res.json({ success: true, count: newQs.length });
+});
+app.get('/api/bank', (req, res) => res.json(readData(FILES.BANK)));
+
+// --- 4. EXAM PAPERS & PUBLISHING ---
+app.post('/api/papers', (req, res) => {
+    const papers = readData(FILES.PAPERS);
+    // Replace old paper if Subject+Class matches, or add new
+    const idx = papers.findIndex(p => p.subject === req.body.subject && p.classGrade === req.body.classGrade);
+    if (idx > -1) papers[idx] = { id: Date.now(), ...req.body };
+    else papers.push({ id: Date.now(), ...req.body });
+    
+    writeData(FILES.PAPERS, papers);
+    res.json({ success: true });
+});
+app.get('/api/papers', (req, res) => res.json(readData(FILES.PAPERS)));
+
+// --- 5. RESULTS ---
+app.post('/api/submit', (req, res) => {
+    const results = readData(FILES.RESULTS);
+    results.push({ id: Date.now(), timestamp: new Date().toLocaleString(), ...req.body });
+    writeData(FILES.RESULTS, results);
+    res.json({ success: true });
+});
+app.get('/api/results', (req, res) => res.json(readData(FILES.RESULTS)));
+
+// Start Server
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n=========================================`);
-    console.log(`✅ VISWAM EXAM SERVER IS ACTIVE`);
-    console.log(`🌐 Local Access: http://localhost:${PORT}`);
-    console.log(`🔑 Admin Password: Viswam@2026`);
-    console.log(`📂 Data stored in: ${DATA_DIR}`);
-    console.log(`=========================================\n`);
+    console.log(`\n✅ VISWAM SERVER ONLINE`);
+    console.log(`🔗 Local URL: http://localhost:${PORT}`);
+    console.log(`🔑 Admin Pass: Viswam@2026\n`);
 });

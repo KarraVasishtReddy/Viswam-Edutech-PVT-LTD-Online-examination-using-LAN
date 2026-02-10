@@ -1,0 +1,62 @@
+[
+  {
+    "text": "Find the derivative d/dx of (sin x + cos x).",
+    "options": { "A": "cos x + sin x", "B": "cos x - sin x", "C": "sin x - cos x", "D": "-cos x - sin x" },
+    "correct": "B",
+    "subject": "Calculus - Derivatives"
+  },
+  {
+    "text": "What is the value of ∫ x² dx?",
+    "options": { "A": "2x + C", "B": "x³/3 + C", "C": "x²/2 + C", "D": "3x³ + C" },
+    "correct": "B",
+    "subject": "Calculus - Integration"
+  },
+  {
+    "text": "Evaluate the derivative of e^(2x) with respect to x.",
+    "options": { "A": "e^(2x)", "B": "2e^x", "C": "2e^(2x)", "D": "1/2 e^(2x)" },
+    "correct": "C",
+    "subject": "Calculus - Derivatives"
+  },
+  {
+    "text": "Find the value of the definite integral: ∫₀¹ (3x²) dx.",
+    "options": { "A": "1", "B": "3", "C": "0", "D": "2" },
+    "correct": "A",
+    "subject": "Calculus - Integration"
+  },
+  {
+    "text": "The derivative of log(x) (natural log) is:",
+    "options": { "A": "e^x", "B": "x", "C": "1/x", "D": "1" },
+    "correct": "C",
+    "subject": "Calculus - Derivatives"
+  },
+  {
+    "text": "Evaluate ∫ sin(x) dx.",
+    "options": { "A": "cos(x) + C", "B": "-cos(x) + C", "C": "sin(x) + C", "D": "tan(x) + C" },
+    "correct": "B",
+    "subject": "Calculus - Integration"
+  },
+  {
+    "text": "What is the derivative of a constant 'k'?",
+    "options": { "A": "k", "B": "1", "C": "0", "D": "x" },
+    "correct": "C",
+    "subject": "Calculus - Derivatives"
+  },
+  {
+    "text": "Using the Power Rule, find d/dx of x⁵.",
+    "options": { "A": "5x⁴", "B": "4x⁵", "C": "5x⁶", "D": "x⁴" },
+    "correct": "A",
+    "subject": "Calculus - Derivatives"
+  },
+  {
+    "text": "Find the integral ∫ (1/x) dx.",
+    "options": { "A": "1", "B": "log|x| + C", "C": "x² + C", "D": "-1/x² + C" },
+    "correct": "B",
+    "subject": "Calculus - Integration"
+  },
+  {
+    "text": "The second derivative (d²/dx²) of x³ is:",
+    "options": { "A": "3x²", "6x": "6x", "C": "6", "D": "3x" },
+    "correct": "B",
+    "subject": "Calculus - Derivatives"
+  }
+]

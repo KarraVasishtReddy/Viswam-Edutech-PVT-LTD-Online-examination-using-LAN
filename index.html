@@ -3,295 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viswam Edutech Portal</title>
+    <title>Viswam Edutech | Exam Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; --text: #333; --white: #fff; --danger: #e74c3c; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        :root { --primary: #2d7a8a; --bg: #f4f6f8; --text: #333; --danger: #e74c3c; --success: #27ae60; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--text); }
         .hidden { display: none !important; }
         .container { max-width: 1100px; margin: 0 auto; }
-
+        
         /* HEADER */
-        .header { background: var(--white); padding: 15px 30px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; border-bottom: 4px solid var(--accent); }
-        .header img { max-height: 60px; }
-        .header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+        .title-bar { 
+            background: white; padding: 15px 30px; border-radius: 12px; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 4px solid var(--primary);
+        }
+        .logo-box img { max-height: 60px; object-fit: contain; }
+        .title-text { text-align: center; flex: 1; color: var(--primary); }
 
-        /* CARDS & INPUTS */
-        .card { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; margin-bottom: 10px; }
-        
-        /* BUTTONS */
-        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; }
+        /* CARDS */
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-top: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-accent { background: var(--accent); color: white; }
-        .btn-success { background: #27ae60; color: white; }
+        .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
-
-        /* REVIEW TABLE */
-        .review-list { max-height: 400px; overflow-y: auto; border: 1px solid #ddd; margin-top: 15px; }
-        .review-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; background: #fff; }
-        .review-item:nth-child(even) { background: #f9f9f9; }
-        .review-item button { margin-left: 10px; }
-
-        /* TABS */
-        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
         
-        /* EXAM TIMER */
-        .timer-float { position: sticky; top: 10px; background: #2c3e50; color: #fff; padding: 10px 20px; border-radius: 30px; text-align: center; font-weight: bold; z-index: 100; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        /* TABLES & TABS */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        .tab-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+
+        /* PROCTORING */
+        .proctor-row { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .violation-badge { background: #fee2e2; color: var(--danger); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--danger); font-size: 0.8rem; }
+        .progress-track { width: 100px; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); }
+
+        /* STUDENT EXAM */
+        .preview-box { text-align: center; padding: 40px; border: 2px dashed var(--primary); background: #f0f9fa; border-radius: 15px; }
+        .timer-sticky { position: sticky; top: 0; background: #2c3e50; color: white; padding: 15px; text-align: center; font-size: 1.2rem; font-weight: bold; border-radius: 0 0 10px 10px; z-index: 100; }
+        .option-label { display: block; padding: 15px; border: 1px solid #eee; border-radius: 8px; margin: 10px 0; cursor: pointer; transition: 0.2s; }
+        .option-label:hover { background: #eef; border-color: var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="header no-print">
-        <img src="iitneet.png" alt="Logo L" onerror="this.style.display='none'">
-        <div style="text-align:center">
-            <h1>Viswam Edutech Portal</h1>
-            <small>Secure Examination System</small>
+    <header class="title-bar no-print">
+        <div class="logo-box"><img src="iitneet.png" alt="IIT-NEET"></div>
+        <div class="title-text">
+            <h1 style="margin:0;">IIT-NEET Portal</h1>
+            <p style="margin:5px 0 0 0; font-size:0.9rem;">Viswam Edutech Curriculum</p>
         </div>
-        <img src="viswam.png" alt="Logo R" onerror="this.style.display='none'">
-    </div>
+        <div class="logo-box"><img src="viswam.png" alt="Viswam"></div>
+    </header>
 
-    <div id="viewLogin" class="container" style="max-width: 400px;">
+    <div id="viewLogin" class="container" style="max-width: 450px; margin-top: 50px;">
         <div class="card">
-            <h2 style="text-align:center; color:var(--primary);">Login</h2>
+            <h2 style="text-align:center; color:var(--primary);">Portal Login</h2>
             <form onsubmit="handleLogin(event)">
                 <label>User ID</label>
-                <input type="text" id="loginUser" placeholder="admin / S101" required>
-                <label>Password</label>
-                <input type="password" id="loginPass" placeholder="Password" required>
+                <input type="text" id="loginUser" placeholder="e.g. admin or S101" required>
                 
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="Enter Password" required>
+
                 <div id="studentFilters">
-                    <label>Class</label><input type="text" id="loginClass" placeholder="e.g. 10th">
-                    <label>Subject</label><input type="text" id="loginSubj" placeholder="e.g. Maths">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div><label>Class</label><input type="text" id="loginClass" placeholder="e.g. 10th"></div>
+                        <div><label>Subject</label><input type="text" id="loginSubj" placeholder="e.g. Maths"></div>
+                    </div>
                 </div>
-                <button type="submit" class="btn-primary" style="width:100%">Login</button>
+
+                <button type="submit" class="btn-primary" style="width:100%;">Access System</button>
             </form>
             <p id="loginMsg" style="color:red; text-align:center; margin-top:10px;"></p>
         </div>
     </div>
 
     <div id="viewAdmin" class="container hidden">
-        <div class="nav-tabs">
-            <button class="btn-primary" onclick="switchTab('create')">Build Exam</button>
-            <button class="btn-primary" onclick="switchTab('students')">Students</button>
-            <button class="btn-primary" onclick="switchTab('results')">Results</button>
+        <div class="tab-row">
+            <button class="btn-primary" onclick="showTab('create')">Build Exam</button>
+            <button class="btn-primary" onclick="showTab('students')">Students</button>
+            <button class="btn-primary" onclick="showTab('monitor')">Live Proctor</button>
+            <button class="btn-success" onclick="showTab('results')">Results</button>
             <button class="btn-danger" onclick="location.reload()">Logout</button>
         </div>
 
         <div id="tabCreate" class="hidden">
-            
-            <div class="card">
-                <h3>1. Question Bank</h3>
-                <div style="display:flex; gap:10px; align-items: center;">
-                    <input type="file" accept=".json" id="fileImport">
-                    <button class="btn-accent" onclick="bulkImport()">Import JSON</button>
-                    <button class="btn-primary" onclick="document.getElementById('manualEntry').classList.toggle('hidden')">Add Manual Question</button>
-                </div>
-                
-                <div id="manualEntry" class="hidden" style="margin-top:10px; padding:10px; border:1px dashed #ccc;">
-                    <textarea id="qText" placeholder="Question Text..." rows="2"></textarea>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                        <input type="text" id="optA" placeholder="Option A"> <input type="text" id="optB" placeholder="Option B">
-                        <input type="text" id="optC" placeholder="Option C"> <input type="text" id="optD" placeholder="Option D">
-                    </div>
-                    <select id="qCorrect"><option value="A">Answer A</option><option value="B">Answer B</option><option value="C">Answer C</option><option value="D">Answer D</option></select>
-                    <button class="btn-success btn-sm" onclick="addQuestion()">Save to Bank</button>
-                </div>
+            <div class="card" style="background:#fffbeb; border:1px solid #f59e0b;">
+                <h3>🚀 Bulk Import (JSON)</h3>
+                <input type="file" accept=".json" onchange="bulkImport(this)">
             </div>
-
-            <div class="card" style="background: #eef2f3; border-left: 5px solid var(--accent);">
-                <h3>2. Draft & Review Paper</h3>
-                
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px;">
-                    <input type="text" id="draftSubj" placeholder="Subject (e.g. Maths)">
-                    <input type="text" id="draftClass" placeholder="Class (e.g. 10th)">
-                    <input type="number" id="draftTime" placeholder="Mins" value="30">
-                    <input type="number" id="draftLimit" placeholder="Count (e.g. 50)">
+            <div class="card">
+                <h3>Add Question (Manual / OCR)</h3>
+                <input type="file" accept="image/*" onchange="runOCR(this)">
+                <textarea id="qText" placeholder="Question Text..." rows="2"></textarea>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="text" id="optA" placeholder="Option A"> <input type="text" id="optB" placeholder="Option B">
+                    <input type="text" id="optC" placeholder="Option C"> <input type="text" id="optD" placeholder="Option D">
                 </div>
-                <button class="btn-accent" onclick="generateDraft()">Generate Draft</button>
+                <select id="qCorrect"><option value="A">Answer A</option><option value="B">Answer B</option><option value="C">Answer C</option><option value="D">Answer D</option></select>
+                <button class="btn-primary" onclick="addQuestion()">Add to Bank</button>
+            </div>
+            <div class="card">
+                <h3>Publish Exam Paper</h3>
+                <button class="btn-primary" onclick="loadBank()">Refresh Bank</button>
+                <div id="bankList" style="margin:15px 0; max-height:200px; overflow-y:auto; border:1px solid #eee; padding:10px;"></div>
                 
-                <div id="reviewContainer" class="hidden">
-                    <h4 style="margin:15px 0 5px 0;">Paper Review (<span id="draftCount">0</span> Questions)</h4>
-                    <p style="font-size:0.8rem; color:#666;">Check questions below. Click 'Remove' to delete specific ones.</p>
-                    
-                    <div id="draftList" class="review-list"></div>
-                    
-                    <br>
-                    <button class="btn-success" style="width:100%; padding:15px; font-size:1.1rem;" onclick="publishFinal()">✅ CONFIRM & PUBLISH EXAM</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="text" id="pubSubj" placeholder="Subject (MUST match Login)">
+                    <input type="text" id="pubClass" placeholder="Class (MUST match Login)">
+                    <input type="number" id="pubTime" placeholder="Duration (Mins)" value="30">
+                    <input type="number" id="pubLimit" placeholder="Random Question Limit (e.g. 50)">
                 </div>
+                <button class="btn-success" onclick="publishExam()" style="width:100%; margin-top:10px;">Publish Exam</button>
             </div>
         </div>
 
         <div id="tabStudents" class="hidden">
             <div class="card">
                 <h3>Register Student</h3>
-                <div style="display:flex; gap:10px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <input type="text" id="newUid" placeholder="Student ID">
                     <input type="password" id="newPass" placeholder="Password">
-                    <button class="btn-success" onclick="addStudent()">Add</button>
                 </div>
-                <div id="studentList" style="margin-top:15px;"></div>
+                <button class="btn-success" onclick="addStudent()">Save Student</button>
             </div>
+            <div class="card"><table id="tblUsers"><thead><tr><th>ID</th><th>Action</th></tr></thead><tbody></tbody></table></div>
         </div>
 
-        <div id="tabResults" class="hidden">
-            <div class="card">
-                <h3>Exam Results</h3>
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead><tr style="background:#eee; text-align:left;"><th>Student</th><th>Subject</th><th>Score</th><th>Time</th></tr></thead>
-                    <tbody id="resultList"></tbody>
-                </table>
-            </div>
-        </div>
+        <div id="tabMonitor" class="hidden"><div class="card"><h3>Live Proctoring</h3><div id="monitorList"></div></div></div>
+
+        <div id="tabResults" class="hidden"><div class="card"><table id="tblResults"><thead><tr><th>Student</th><th>Subject</th><th>Score</th><th>Time</th></tr></thead><tbody></tbody></table></div></div>
     </div>
 
-    <div id="viewPreview" class="container hidden" style="text-align:center;">
-        <div class="card">
-            <h1 id="preTitle" style="color:var(--primary)">Exam Ready</h1>
-            <p id="preMeta" style="font-size:1.2rem; margin-bottom:20px;">--</p>
-            <button class="btn-success" onclick="startExam()" style="font-size:1.2rem; padding:15px; width:200px;">START</button>
+    <div id="viewPreview" class="container hidden">
+        <div class="card preview-box">
+            <h1 id="preTitle" style="color:var(--primary); margin-bottom:10px;">Exam Ready</h1>
+            <p id="preMeta" style="font-size:1.2rem; color:#666;">--</p>
+            <div style="text-align:left; background:white; padding:20px; border-radius:10px; margin:20px 0;">
+                <strong>Instructions:</strong>
+                <ul><li>Do not refresh the page.</li><li>Do not switch tabs (Lockdown Active).</li><li>Click "Start" to begin timer.</li></ul>
+            </div>
+            <button class="btn-success" onclick="startExam()" style="font-size:1.2rem; width:200px;">START EXAM</button>
         </div>
     </div>
 
     <div id="viewExam" class="container hidden">
-        <div id="examTimer" class="timer-float">Time Left: --:--</div>
-        <div id="examContainer"></div>
-        <br>
-        <button class="btn-success" style="width:100%; padding:15px;" onclick="submitExam()">SUBMIT PAPER</button>
+        <div id="examTimer" class="timer-sticky">Time Left: --:--</div>
+        <div id="examQuestions" style="margin-top:20px;"></div>
+        <button class="btn-success" onclick="submitExam()" style="width:100%; margin-top:30px; padding:20px; font-size:1.2rem;">Submit Final Paper</button>
     </div>
 
     <script>
         const API = '/api';
-        let userCtx = {}; 
-        let currentDraft = []; // Stores questions currently being reviewed
-        let examData = {}; 
-        let activeQs = [];
-        let timerInt;
+        let userCtx = {}; let examData = {}; let activeQs = []; let timerInt; let monitorInt;
+        let violations = 0;
 
-        // --- AUTH ---
+        // --- AUTH & LOGIN ---
         async function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('loginUser').value;
             const p = document.getElementById('loginPass').value;
-
-            if(u.toLowerCase() === 'admin' && p === 'Viswam@2026') {
-                showView('viewAdmin'); switchTab('create'); return;
+            
+            // ADMIN
+            if(u === 'admin' && p === 'Viswam@2026') {
+                showView('viewAdmin'); showTab('students'); return;
             }
 
+            // STUDENT
             const cls = document.getElementById('loginClass').value;
             const subj = document.getElementById('loginSubj').value;
-            if(!cls || !subj) { alert("Enter Class & Subject"); return; }
+            if(!cls || !subj) { alert("Please enter Class and Subject to find your exam."); return; }
 
-            try {
-                const res = await fetch(API + '/users');
-                const users = await res.json();
-                const valid = users.find(x => x.username === u && x.password === p);
-                if(valid) {
-                    userCtx = { ...valid, class: cls, subject: subj };
-                    findPaper(cls, subj);
-                } else { document.getElementById('loginMsg').innerText = "Invalid Login"; }
-            } catch(e) { alert("Server Offline"); }
-        }
-        
-        document.getElementById('loginUser').addEventListener('input', (e) => {
-            document.getElementById('studentFilters').style.display = e.target.value.toLowerCase() === 'admin' ? 'none' : 'block';
-        });
+            const res = await fetch(API + '/users');
+            const users = await res.json();
+            const valid = users.find(x => x.username === u && x.password === p);
 
-        // --- DRAFTING & REVIEW LOGIC (NEW) ---
-        async function generateDraft() {
-            const limit = parseInt(document.getElementById('draftLimit').value) || 0;
-            const subjFilter = document.getElementById('draftSubj').value.trim();
-
-            const bank = await (await fetch(API + '/bank')).json();
-            if(bank.length === 0) { alert("Bank is empty!"); return; }
-
-            // 1. Filter by Subject (if typed)
-            let filtered = bank;
-            if(subjFilter) {
-                filtered = bank.filter(q => q.subject && q.subject.toLowerCase().includes(subjFilter.toLowerCase()));
+            if(valid) {
+                userCtx = { ...valid, class: cls, subject: subj };
+                findPaper(cls, subj);
+            } else {
+                document.getElementById('loginMsg').innerText = "Invalid Credentials";
             }
-
-            if(filtered.length === 0) { alert(`No questions found for subject: ${subjFilter}`); return; }
-
-            // 2. Randomize & Limit
-            currentDraft = filtered.sort(() => Math.random() - 0.5);
-            if(limit > 0 && currentDraft.length > limit) {
-                currentDraft = currentDraft.slice(0, limit);
-            }
-
-            renderReview();
-            document.getElementById('reviewContainer').classList.remove('hidden');
         }
 
-        function renderReview() {
-            document.getElementById('draftCount').innerText = currentDraft.length;
-            document.getElementById('draftList').innerHTML = currentDraft.map((q, i) => `
-                <div class="review-item">
-                    <div>
-                        <span style="font-weight:bold; color:#666;">#${i+1}</span> 
-                        ${q.text.substring(0, 80)}...
-                    </div>
-                    <button class="btn-danger btn-sm" onclick="removeFromDraft(${i})">Remove</button>
-                </div>
-            `).join('');
-        }
-
-        function removeFromDraft(index) {
-            currentDraft.splice(index, 1);
-            renderReview();
-        }
-
-        async function publishFinal() {
-            const subj = document.getElementById('draftSubj').value;
-            const cls = document.getElementById('draftClass').value;
-            const dur = document.getElementById('draftTime').value;
-
-            if(!subj || !cls) { alert("Subject and Class are required to publish."); return; }
-            if(currentDraft.length === 0) { alert("Draft is empty!"); return; }
-
-            const paper = { subject: subj, classGrade: cls, duration: dur, questions: currentDraft };
-
-            await fetch(API + '/papers', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify(paper)
-            });
-
-            alert(`✅ Exam Published Successfully!\nQuestions: ${currentDraft.length}\nSubject: ${subj}\nClass: ${cls}`);
-            document.getElementById('reviewContainer').classList.add('hidden');
-            currentDraft = []; // Clear draft
-        }
-
-        // --- BANK MANAGEMENT ---
-        async function bulkImport() {
-            const file = document.getElementById('fileImport').files[0];
-            if(!file) return;
-            const r = new FileReader();
-            r.onload = async (e) => {
-                const res = await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:e.target.result});
-                alert(`Imported ${(await res.json()).count} questions`);
-            };
-            r.readAsText(file);
-        }
-
-        async function addQuestion() {
-            const q = {
-                text: document.getElementById('qText').value,
-                options: {
-                    A: document.getElementById('optA').value, B: document.getElementById('optB').value,
-                    C: document.getElementById('optC').value, D: document.getElementById('optD').value
-                },
-                correct: document.getElementById('qCorrect').value,
-                // Assign subject from filter box or default
-                subject: document.getElementById('draftSubj').value || "General" 
-            };
-            await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify([q])});
-            alert("Added!");
-            document.getElementById('manualEntry').classList.add('hidden');
-        }
-
-        // --- EXAM FLOW ---
         async function findPaper(cls, subj) {
             const res = await fetch(API + '/papers');
             const papers = await res.json();
@@ -299,52 +195,142 @@
 
             if(match) {
                 examData = match;
-                document.getElementById('preTitle').innerText = match.subject;
-                document.getElementById('preMeta').innerText = `Class: ${match.classGrade} | Time: ${match.duration} Min`;
+                document.getElementById('preTitle').innerText = `${match.subject} Exam`;
+                document.getElementById('preMeta').innerText = `Class: ${match.classGrade} | Questions: ${match.questions.length} | Time: ${match.duration} mins`;
                 showView('viewPreview');
-            } else { alert("Exam Not Found"); location.reload(); }
+            } else {
+                alert(`No exam found for ${subj} (${cls}). Ask Admin to publish it.`);
+                location.reload();
+            }
         }
 
+        // --- EXAM ENGINE ---
         function startExam() {
             showView('viewExam');
-            // Randomize questions for this specific student session
+            // Randomize Questions for this student
             activeQs = examData.questions.sort(() => Math.random() - 0.5);
             
-            document.getElementById('examContainer').innerHTML = activeQs.map((q, i) => `
+            // Randomize Options (A/B/C/D)
+            document.getElementById('examQuestions').innerHTML = activeQs.map((q, i) => {
+                const keys = ['A','B','C','D'].sort(() => Math.random() - 0.5);
+                return `
                 <div class="card">
                     <p><strong>Q${i+1}:</strong> ${q.text}</p>
-                    ${['A','B','C','D'].sort(()=>Math.random()-0.5).map(k => `
-                        <label style="display:block; padding:5px;"><input type="radio" name="q${i}" value="${k}"> ${q.options[k]}</label>
-                    `).join('')}
-                </div>
-            `).join('');
+                    <div>${keys.map(k => `<label class="option-label"><input type="radio" name="q${i}" value="${k}" onclick="pulse()"> ${q.options[k]}</label>`).join('')}</div>
+                </div>`;
+            }).join('');
 
-            let s = examData.duration * 60;
+            // Start Timer & Proctoring
+            let sec = examData.duration * 60;
             timerInt = setInterval(() => {
-                s--;
-                document.getElementById('examTimer').innerText = `Time: ${Math.floor(s/60)}:${s%60}`;
-                if(s<=0) { clearInterval(timerInt); submitExam(); }
+                document.getElementById('examTimer').innerText = `Time Left: ${Math.floor(sec/60)}:${(sec%60).toString().padStart(2,'0')}`;
+                if(sec-- <= 0) { clearInterval(timerInt); submitExam(); }
             }, 1000);
+            setInterval(pulse, 10000); // Heartbeat every 10s
         }
 
         async function submitExam() {
             clearInterval(timerInt);
             let score = 0;
-            activeQs.forEach((q, i) => {
+            activeQs.forEach((q, i) => { 
                 const sel = document.querySelector(`input[name="q${i}"]:checked`);
                 if(sel && sel.value === q.correct) score++;
             });
-            await fetch(API+'/submit', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({studentName:userCtx.username, subject:examData.subject, score:`${score}/${activeQs.length}`})});
-            alert(`Submitted! Score: ${score}`); location.reload();
+
+            await fetch(API + '/submit', { 
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ studentName: userCtx.username, subject: examData.subject, score: `${score}/${activeQs.length}` })
+            });
+
+            // Auto-Certificate
+            const w = window.open('', '_blank');
+            w.document.write(`<div style="border:10px solid #2d7a8a; padding:50px; text-align:center; font-family:sans-serif;"><h1>Certificate of Completion</h1><h2>${userCtx.username}</h2><p>Subject: ${examData.subject}</p><h3>Score: ${score}/${activeQs.length}</h3></div>`);
+            
+            alert("Exam Submitted!");
+            location.reload();
         }
 
-        // --- HELPERS ---
-        function showView(v) { ['viewLogin','viewAdmin','viewPreview','viewExam'].forEach(x => document.getElementById(x).classList.add('hidden')); document.getElementById(v).classList.remove('hidden'); }
-        function switchTab(t) { ['tabCreate','tabStudents','tabResults'].forEach(x => document.getElementById(x).classList.add('hidden')); document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); if(t==='students') loadUsers(); if(t==='results') loadResults(); }
-        async function loadUsers() { const d = await (await fetch(API+'/users')).json(); document.getElementById('studentList').innerHTML = d.map(u => `<div>${u.username} <button onclick="delUser('${u.username}')" class="btn-danger btn-sm">X</button></div>`).join(''); }
+        // --- PROCTORING ---
+        function pulse() {
+            const done = document.querySelectorAll('input[type="radio"]:checked').length;
+            const prog = Math.round((done / activeQs.length) * 100);
+            fetch(API + '/proctor/heartbeat', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ username: userCtx.username, subject: examData.subject, progress: prog, alerts: violations })
+            });
+        }
+        
+        window.addEventListener('blur', () => { if(document.getElementById('viewExam').classList.contains('hidden') === false) { violations++; alert("⚠️ Tab Switch Detected!"); pulse(); }});
+
+        // --- ADMIN DASHBOARD ---
+        function showTab(t) {
+            clearInterval(monitorInt);
+            ['tabCreate','tabStudents','tabMonitor','tabResults'].forEach(x => document.getElementById(x).classList.add('hidden'));
+            document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
+            if(t==='students') loadUsers();
+            if(t==='results') loadResults();
+            if(t==='monitor') { loadMonitor(); monitorInt = setInterval(loadMonitor, 5000); }
+        }
+
+        // Manage Students
         async function addStudent() { await fetch(API+'/users', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:document.getElementById('newUid').value, password:document.getElementById('newPass').value})}); loadUsers(); }
-        async function delUser(id) { await fetch(API+'/users/'+id, {method:'DELETE'}); loadUsers(); }
-        async function loadResults() { const d = await (await fetch(API+'/results')).json(); document.getElementById('resultList').innerHTML = d.map(r => `<tr><td>${r.studentName}</td><td>${r.subject}</td><td>${r.score}</td><td>${r.timestamp}</td></tr>`).join(''); }
+        async function loadUsers() { const d = await (await fetch(API+'/users')).json(); document.querySelector('#tblUsers tbody').innerHTML = d.map(u => `<tr><td>${u.username}</td><td><button class="btn-danger" onclick="delUser('${u.username}')">Delete</button></td></tr>`).join(''); }
+        async function delUser(id) { if(confirm("Delete?")) await fetch(API+'/users/'+id, {method:'DELETE'}); loadUsers(); }
+
+        // Create Exam
+        async function runOCR(inp) { const r = await Tesseract.recognize(inp.files[0], 'eng'); document.getElementById('qText').value = r.data.text; }
+        async function bulkImport(inp) { 
+            const r = new FileReader(); r.onload = async (e) => {
+                const res = await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:e.target.result});
+                alert(`Imported ${(await res.json()).count} questions`); loadBank();
+            }; r.readAsText(inp.files[0]);
+        }
+        async function addQuestion() {
+            const q = { text: document.getElementById('qText').value, options: {A:document.getElementById('optA').value, B:document.getElementById('optB').value, C:document.getElementById('optC').value, D:document.getElementById('optD').value}, correct: document.getElementById('qCorrect').value };
+            await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify([q])});
+            alert("Added"); loadBank();
+        }
+        async function loadBank() { const d = await (await fetch(API+'/bank')).json(); document.getElementById('bankList').innerHTML = d.map(q => `<div><input type="checkbox" class="q-pick" value="${q.id}"> ${q.text.substring(0,60)}...</div>`).join(''); }
+        
+        async function publishExam() {
+            let qList = await (await fetch(API+'/bank')).json();
+            const pickedIds = Array.from(document.querySelectorAll('.q-pick:checked')).map(x => parseFloat(x.value));
+            
+            // Logic: Use picked questions OR random sample from bank
+            let finalQs = pickedIds.length > 0 ? qList.filter(q => pickedIds.includes(q.id)) : qList;
+            
+            // Apply Random Limit
+            const limit = parseInt(document.getElementById('pubLimit').value);
+            if(limit && finalQs.length > limit) finalQs = finalQs.sort(() => Math.random() - 0.5).slice(0, limit);
+
+            const paper = { 
+                subject: document.getElementById('pubSubj').value, 
+                classGrade: document.getElementById('pubClass').value,
+                duration: document.getElementById('pubTime').value,
+                questions: finalQs 
+            };
+            await fetch(API+'/papers', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(paper)});
+            alert(`Exam Published! (${finalQs.length} Questions)`);
+        }
+
+        // Monitor & Results
+        async function loadMonitor() {
+            const d = await (await fetch(API+'/proctor/sessions')).json();
+            document.getElementById('monitorList').innerHTML = d.map(s => `
+                <div class="proctor-row">
+                    <div><strong>${s.username}</strong> (${s.subject})</div>
+                    <div>
+                        <div class="progress-track"><div class="progress-fill" style="width:${s.progress}%"></div></div>
+                        ${s.alerts > 0 ? `<span class="violation-badge">Violations: ${s.alerts}</span>` : ''}
+                    </div>
+                </div>`).join('');
+        }
+        async function loadResults() { const d = await (await fetch(API+'/results')).json(); document.querySelector('#tblResults tbody').innerHTML = d.map(r => `<tr><td>${r.studentName}</td><td>${r.subject}</td><td><b>${r.score}</b></td><td>${r.timestamp}</td></tr>`).join(''); }
+
+        // --- UI HELPERS ---
+        function showView(v) { ['viewLogin','viewAdmin','viewPreview','viewExam'].forEach(x => document.getElementById(x).classList.add('hidden')); document.getElementById(v).classList.remove('hidden'); }
+        // Toggle Filters on Login
+        document.getElementById('loginUser').addEventListener('input', (e) => { document.getElementById('studentFilters').style.display = e.target.value==='admin' ? 'none' : 'block'; });
     </script>
 </body>
 </html>

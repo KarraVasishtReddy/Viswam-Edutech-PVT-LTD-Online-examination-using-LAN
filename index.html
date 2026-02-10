@@ -6,37 +6,39 @@
     <title>Viswam Edutech Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-        :root { --primary: #0056b3; --bg: #f4f7f6; --text: #333; --white: #fff; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; --text: #333; --white: #fff; --danger: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .hidden { display: none !important; }
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1100px; margin: 0 auto; }
 
         /* HEADER */
-        .header { background: var(--white); padding: 15px 30px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .header img { max-height: 50px; }
+        .header { background: var(--white); padding: 15px 30px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; border-bottom: 4px solid var(--accent); }
+        .header img { max-height: 60px; }
         .header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
 
-        /* CARDS */
-        .card { background: var(--white); padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        /* CARDS & INPUTS */
+        .card { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; margin-bottom: 10px; }
         
         /* BUTTONS */
-        button { padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; }
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-block { width: 100%; }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+
+        /* REVIEW TABLE */
+        .review-list { max-height: 400px; overflow-y: auto; border: 1px solid #ddd; margin-top: 15px; }
+        .review-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; background: #fff; }
+        .review-item:nth-child(even) { background: #f9f9f9; }
+        .review-item button { margin-left: 10px; }
 
         /* TABS */
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
         
-        /* EXAM STYLES */
-        .timer-float { position: sticky; top: 10px; background: #343a40; color: #fff; padding: 10px 20px; border-radius: 30px; text-align: center; font-weight: bold; z-index: 100; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .option-row { display: flex; align-items: center; padding: 10px; border: 1px solid #eee; margin-top: 5px; border-radius: 5px; cursor: pointer; }
-        .option-row:hover { background: #f8f9fa; border-color: var(--primary); }
-        .option-row input { width: auto; margin-right: 10px; }
+        /* EXAM TIMER */
+        .timer-float { position: sticky; top: 10px; background: #2c3e50; color: #fff; padding: 10px 20px; border-radius: 30px; text-align: center; font-weight: bold; z-index: 100; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -52,29 +54,18 @@
 
     <div id="viewLogin" class="container" style="max-width: 400px;">
         <div class="card">
-            <h2 style="text-align:center; color:var(--primary);">System Login</h2>
+            <h2 style="text-align:center; color:var(--primary);">Login</h2>
             <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>User ID</label>
-                    <input type="text" id="loginUser" placeholder="admin / S101" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPass" placeholder="Password" required>
-                </div>
+                <label>User ID</label>
+                <input type="text" id="loginUser" placeholder="admin / S101" required>
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="Password" required>
                 
                 <div id="studentFilters">
-                    <div class="form-group">
-                        <label>Target Class</label>
-                        <input type="text" id="loginClass" placeholder="e.g. 10th">
-                    </div>
-                    <div class="form-group">
-                        <label>Target Subject</label>
-                        <input type="text" id="loginSubj" placeholder="e.g. Maths">
-                    </div>
+                    <label>Class</label><input type="text" id="loginClass" placeholder="e.g. 10th">
+                    <label>Subject</label><input type="text" id="loginSubj" placeholder="e.g. Maths">
                 </div>
-
-                <button type="submit" class="btn-primary btn-block">Login</button>
+                <button type="submit" class="btn-primary" style="width:100%">Login</button>
             </form>
             <p id="loginMsg" style="color:red; text-align:center; margin-top:10px;"></p>
         </div>
@@ -84,64 +75,63 @@
         <div class="nav-tabs">
             <button class="btn-primary" onclick="switchTab('create')">Build Exam</button>
             <button class="btn-primary" onclick="switchTab('students')">Students</button>
-            <button class="btn-primary" onclick="switchTab('monitor')">Live Monitor</button>
-            <button class="btn-success" onclick="switchTab('results')">Results</button>
+            <button class="btn-primary" onclick="switchTab('results')">Results</button>
             <button class="btn-danger" onclick="location.reload()">Logout</button>
         </div>
 
         <div id="tabCreate" class="hidden">
-            <div class="card" style="background: #e9f7ef; border:1px solid #28a745;">
-                <h3>Step 1: Publish Exam</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <input type="text" id="pubSubj" placeholder="Subject (e.g. Maths)">
-                    <input type="text" id="pubClass" placeholder="Class (e.g. 10th)">
-                    <input type="number" id="pubTime" placeholder="Duration (Mins)" value="30">
-                    <input type="number" id="pubLimit" placeholder="Question Limit (e.g. 50)">
+            
+            <div class="card">
+                <h3>1. Question Bank</h3>
+                <div style="display:flex; gap:10px; align-items: center;">
+                    <input type="file" accept=".json" id="fileImport">
+                    <button class="btn-accent" onclick="bulkImport()">Import JSON</button>
+                    <button class="btn-primary" onclick="document.getElementById('manualEntry').classList.toggle('hidden')">Add Manual Question</button>
                 </div>
-                <br>
-                <button class="btn-success btn-block" onclick="publishExam()">PUBLISH EXAM</button>
+                
+                <div id="manualEntry" class="hidden" style="margin-top:10px; padding:10px; border:1px dashed #ccc;">
+                    <textarea id="qText" placeholder="Question Text..." rows="2"></textarea>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <input type="text" id="optA" placeholder="Option A"> <input type="text" id="optB" placeholder="Option B">
+                        <input type="text" id="optC" placeholder="Option C"> <input type="text" id="optD" placeholder="Option D">
+                    </div>
+                    <select id="qCorrect"><option value="A">Answer A</option><option value="B">Answer B</option><option value="C">Answer C</option><option value="D">Answer D</option></select>
+                    <button class="btn-success btn-sm" onclick="addQuestion()">Save to Bank</button>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>Step 2: Add Questions</h3>
-                <p>Import JSON file or add manually.</p>
-                <input type="file" accept=".json" onchange="bulkImport(this)">
-                <br><br>
-                <textarea id="qText" placeholder="Or type question text here..." rows="2"></textarea>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                    <input type="text" id="optA" placeholder="Option A">
-                    <input type="text" id="optB" placeholder="Option B">
-                    <input type="text" id="optC" placeholder="Option C">
-                    <input type="text" id="optD" placeholder="Option D">
+            <div class="card" style="background: #eef2f3; border-left: 5px solid var(--accent);">
+                <h3>2. Draft & Review Paper</h3>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px;">
+                    <input type="text" id="draftSubj" placeholder="Subject (e.g. Maths)">
+                    <input type="text" id="draftClass" placeholder="Class (e.g. 10th)">
+                    <input type="number" id="draftTime" placeholder="Mins" value="30">
+                    <input type="number" id="draftLimit" placeholder="Count (e.g. 50)">
                 </div>
-                <select id="qCorrect" style="margin-top:10px;">
-                    <option value="A">Correct: A</option><option value="B">Correct: B</option>
-                    <option value="C">Correct: C</option><option value="D">Correct: D</option>
-                </select>
-                <br><br>
-                <button class="btn-primary" onclick="addQuestion()">Add Single Question</button>
-                <button class="btn-primary" onclick="loadBank()">View Bank</button>
-                <div id="bankList" style="margin-top:10px; max-height:200px; overflow-y:auto; border:1px solid #ddd; padding:5px;"></div>
+                <button class="btn-accent" onclick="generateDraft()">Generate Draft</button>
+                
+                <div id="reviewContainer" class="hidden">
+                    <h4 style="margin:15px 0 5px 0;">Paper Review (<span id="draftCount">0</span> Questions)</h4>
+                    <p style="font-size:0.8rem; color:#666;">Check questions below. Click 'Remove' to delete specific ones.</p>
+                    
+                    <div id="draftList" class="review-list"></div>
+                    
+                    <br>
+                    <button class="btn-success" style="width:100%; padding:15px; font-size:1.1rem;" onclick="publishFinal()">✅ CONFIRM & PUBLISH EXAM</button>
+                </div>
             </div>
         </div>
 
         <div id="tabStudents" class="hidden">
             <div class="card">
-                <h3>Manage Students</h3>
+                <h3>Register Student</h3>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="newUid" placeholder="New Student ID">
+                    <input type="text" id="newUid" placeholder="Student ID">
                     <input type="password" id="newPass" placeholder="Password">
                     <button class="btn-success" onclick="addStudent()">Add</button>
                 </div>
-                <hr>
-                <div id="studentList"></div>
-            </div>
-        </div>
-
-        <div id="tabMonitor" class="hidden">
-            <div class="card">
-                <h3>Live Proctoring</h3>
-                <div id="monitorList"></div>
+                <div id="studentList" style="margin-top:15px;"></div>
             </div>
         </div>
 
@@ -160,15 +150,7 @@
         <div class="card">
             <h1 id="preTitle" style="color:var(--primary)">Exam Ready</h1>
             <p id="preMeta" style="font-size:1.2rem; margin-bottom:20px;">--</p>
-            <div style="text-align:left; background:#f8f9fa; padding:15px; border-radius:5px; margin-bottom:20px;">
-                <strong>Rules:</strong>
-                <ul>
-                    <li>Timer starts immediately after clicking "Start".</li>
-                    <li>Do not refresh the page.</li>
-                    <li>Do not switch browser tabs (Violation will be recorded).</li>
-                </ul>
-            </div>
-            <button class="btn-success btn-block" onclick="startExam()" style="font-size:1.2rem; padding:15px;">START EXAM NOW</button>
+            <button class="btn-success" onclick="startExam()" style="font-size:1.2rem; padding:15px; width:200px;">START</button>
         </div>
     </div>
 
@@ -176,118 +158,173 @@
         <div id="examTimer" class="timer-float">Time Left: --:--</div>
         <div id="examContainer"></div>
         <br>
-        <button class="btn-success btn-block" onclick="submitExam()" style="font-size:1.2rem; padding:15px;">SUBMIT FINAL PAPER</button>
+        <button class="btn-success" style="width:100%; padding:15px;" onclick="submitExam()">SUBMIT PAPER</button>
     </div>
 
     <script>
         const API = '/api';
         let userCtx = {}; 
+        let currentDraft = []; // Stores questions currently being reviewed
         let examData = {}; 
-        let activeQs = []; 
-        let timerInt; 
-        let monitorInt;
-        let violations = 0;
+        let activeQs = [];
+        let timerInt;
 
-        // --- AUTH & LOGIN ---
+        // --- AUTH ---
         async function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('loginUser').value;
             const p = document.getElementById('loginPass').value;
 
-            // ADMIN SHORTCUT
             if(u.toLowerCase() === 'admin' && p === 'Viswam@2026') {
-                showView('viewAdmin'); showTab('create'); return;
+                showView('viewAdmin'); switchTab('create'); return;
             }
 
-            // STUDENT LOGIN
-            const cls = document.getElementById('loginClass').value.trim();
-            const subj = document.getElementById('loginSubj').value.trim();
-            if(!cls || !subj) { alert("Please enter Class and Subject."); return; }
+            const cls = document.getElementById('loginClass').value;
+            const subj = document.getElementById('loginSubj').value;
+            if(!cls || !subj) { alert("Enter Class & Subject"); return; }
 
             try {
                 const res = await fetch(API + '/users');
                 const users = await res.json();
                 const valid = users.find(x => x.username === u && x.password === p);
-
                 if(valid) {
                     userCtx = { ...valid, class: cls, subject: subj };
-                    await findPaper(cls, subj);
-                } else {
-                    document.getElementById('loginMsg').innerText = "Invalid ID or Password";
-                }
-            } catch(err) {
-                alert("Server not reachable. Please check if server.js is running.");
-            }
+                    findPaper(cls, subj);
+                } else { document.getElementById('loginMsg').innerText = "Invalid Login"; }
+            } catch(e) { alert("Server Offline"); }
         }
-
-        // Toggle Login Filters
-        document.getElementById('loginUser').addEventListener('input', function(e) {
-            const isAdm = e.target.value.toLowerCase() === 'admin';
-            document.getElementById('studentFilters').style.display = isAdm ? 'none' : 'block';
+        
+        document.getElementById('loginUser').addEventListener('input', (e) => {
+            document.getElementById('studentFilters').style.display = e.target.value.toLowerCase() === 'admin' ? 'none' : 'block';
         });
 
+        // --- DRAFTING & REVIEW LOGIC (NEW) ---
+        async function generateDraft() {
+            const limit = parseInt(document.getElementById('draftLimit').value) || 0;
+            const subjFilter = document.getElementById('draftSubj').value.trim();
+
+            const bank = await (await fetch(API + '/bank')).json();
+            if(bank.length === 0) { alert("Bank is empty!"); return; }
+
+            // 1. Filter by Subject (if typed)
+            let filtered = bank;
+            if(subjFilter) {
+                filtered = bank.filter(q => q.subject && q.subject.toLowerCase().includes(subjFilter.toLowerCase()));
+            }
+
+            if(filtered.length === 0) { alert(`No questions found for subject: ${subjFilter}`); return; }
+
+            // 2. Randomize & Limit
+            currentDraft = filtered.sort(() => Math.random() - 0.5);
+            if(limit > 0 && currentDraft.length > limit) {
+                currentDraft = currentDraft.slice(0, limit);
+            }
+
+            renderReview();
+            document.getElementById('reviewContainer').classList.remove('hidden');
+        }
+
+        function renderReview() {
+            document.getElementById('draftCount').innerText = currentDraft.length;
+            document.getElementById('draftList').innerHTML = currentDraft.map((q, i) => `
+                <div class="review-item">
+                    <div>
+                        <span style="font-weight:bold; color:#666;">#${i+1}</span> 
+                        ${q.text.substring(0, 80)}...
+                    </div>
+                    <button class="btn-danger btn-sm" onclick="removeFromDraft(${i})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFromDraft(index) {
+            currentDraft.splice(index, 1);
+            renderReview();
+        }
+
+        async function publishFinal() {
+            const subj = document.getElementById('draftSubj').value;
+            const cls = document.getElementById('draftClass').value;
+            const dur = document.getElementById('draftTime').value;
+
+            if(!subj || !cls) { alert("Subject and Class are required to publish."); return; }
+            if(currentDraft.length === 0) { alert("Draft is empty!"); return; }
+
+            const paper = { subject: subj, classGrade: cls, duration: dur, questions: currentDraft };
+
+            await fetch(API + '/papers', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(paper)
+            });
+
+            alert(`✅ Exam Published Successfully!\nQuestions: ${currentDraft.length}\nSubject: ${subj}\nClass: ${cls}`);
+            document.getElementById('reviewContainer').classList.add('hidden');
+            currentDraft = []; // Clear draft
+        }
+
+        // --- BANK MANAGEMENT ---
+        async function bulkImport() {
+            const file = document.getElementById('fileImport').files[0];
+            if(!file) return;
+            const r = new FileReader();
+            r.onload = async (e) => {
+                const res = await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:e.target.result});
+                alert(`Imported ${(await res.json()).count} questions`);
+            };
+            r.readAsText(file);
+        }
+
+        async function addQuestion() {
+            const q = {
+                text: document.getElementById('qText').value,
+                options: {
+                    A: document.getElementById('optA').value, B: document.getElementById('optB').value,
+                    C: document.getElementById('optC').value, D: document.getElementById('optD').value
+                },
+                correct: document.getElementById('qCorrect').value,
+                // Assign subject from filter box or default
+                subject: document.getElementById('draftSubj').value || "General" 
+            };
+            await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify([q])});
+            alert("Added!");
+            document.getElementById('manualEntry').classList.add('hidden');
+        }
+
+        // --- EXAM FLOW ---
         async function findPaper(cls, subj) {
             const res = await fetch(API + '/papers');
             const papers = await res.json();
-            
-            // Case-Insensitive Match
-            const match = papers.find(p => 
-                p.classGrade.toLowerCase() === cls.toLowerCase() && 
-                p.subject.toLowerCase() === subj.toLowerCase()
-            );
+            const match = papers.find(p => p.classGrade.toLowerCase() === cls.toLowerCase() && p.subject.toLowerCase() === subj.toLowerCase());
 
             if(match) {
                 examData = match;
-                document.getElementById('preTitle').innerText = `${match.subject} Exam`;
-                document.getElementById('preMeta').innerText = `Class: ${match.classGrade} | Duration: ${match.duration} Min | Questions: ${match.questions.length}`;
+                document.getElementById('preTitle').innerText = match.subject;
+                document.getElementById('preMeta').innerText = `Class: ${match.classGrade} | Time: ${match.duration} Min`;
                 showView('viewPreview');
-            } else {
-                alert(`No exam found for Subject: ${subj}, Class: ${cls}.\nPlease ask the admin to Publish it.`);
-                location.reload();
-            }
+            } else { alert("Exam Not Found"); location.reload(); }
         }
 
-        // --- EXAM ENGINE ---
         function startExam() {
             showView('viewExam');
-            
-            // 1. Randomize Questions
+            // Randomize questions for this specific student session
             activeQs = examData.questions.sort(() => Math.random() - 0.5);
-
-            // 2. Render
-            document.getElementById('examContainer').innerHTML = activeQs.map((q, i) => {
-                // Randomize Options
-                const keys = ['A','B','C','D'].sort(() => Math.random() - 0.5);
-                return `
+            
+            document.getElementById('examContainer').innerHTML = activeQs.map((q, i) => `
                 <div class="card">
                     <p><strong>Q${i+1}:</strong> ${q.text}</p>
-                    <div>
-                        ${keys.map(k => `
-                            <label class="option-row">
-                                <input type="radio" name="q${i}" value="${k}" onclick="pulse()"> ${q.options[k]}
-                            </label>
-                        `).join('')}
-                    </div>
-                </div>`;
-            }).join('');
+                    ${['A','B','C','D'].sort(()=>Math.random()-0.5).map(k => `
+                        <label style="display:block; padding:5px;"><input type="radio" name="q${i}" value="${k}"> ${q.options[k]}</label>
+                    `).join('')}
+                </div>
+            `).join('');
 
-            // 3. Start Timer
-            let sec = examData.duration * 60;
-            updateTimer(sec);
+            let s = examData.duration * 60;
             timerInt = setInterval(() => {
-                sec--;
-                updateTimer(sec);
-                if(sec <= 0) { clearInterval(timerInt); submitExam(); }
+                s--;
+                document.getElementById('examTimer').innerText = `Time: ${Math.floor(s/60)}:${s%60}`;
+                if(s<=0) { clearInterval(timerInt); submitExam(); }
             }, 1000);
-
-            // 4. Start Monitoring
-            setInterval(pulse, 10000);
-        }
-
-        function updateTimer(s) {
-            const m = Math.floor(s / 60);
-            const remS = s % 60;
-            document.getElementById('examTimer').innerText = `Time Left: ${m}:${remS < 10 ? '0'+remS : remS}`;
         }
 
         async function submitExam() {
@@ -297,112 +334,17 @@
                 const sel = document.querySelector(`input[name="q${i}"]:checked`);
                 if(sel && sel.value === q.correct) score++;
             });
-
-            await fetch(API + '/submit', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({
-                    studentName: userCtx.username,
-                    subject: examData.subject,
-                    score: `${score}/${activeQs.length}`
-                })
-            });
-
-            alert(`Submitted! Your Score: ${score}/${activeQs.length}`);
-            location.reload();
+            await fetch(API+'/submit', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({studentName:userCtx.username, subject:examData.subject, score:`${score}/${activeQs.length}`})});
+            alert(`Submitted! Score: ${score}`); location.reload();
         }
 
-        // --- PROCTORING ---
-        function pulse() {
-            const done = document.querySelectorAll('input[type="radio"]:checked').length;
-            const prog = Math.round((done / activeQs.length) * 100) || 0;
-            
-            fetch(API + '/proctor/heartbeat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    username: userCtx.username,
-                    subject: examData.subject,
-                    progress: prog,
-                    alerts: violations
-                })
-            });
-        }
-
-        window.addEventListener('blur', () => {
-            if(!document.getElementById('viewExam').classList.contains('hidden')) {
-                violations++;
-                alert("⚠️ WARNING: Tab switching is monitored!");
-                pulse();
-            }
-        });
-
-        // --- ADMIN FUNCTIONS ---
-        async function publishExam() {
-            const subj = document.getElementById('pubSubj').value.trim();
-            const cls = document.getElementById('pubClass').value.trim();
-            const dur = document.getElementById('pubTime').value;
-            const limit = parseInt(document.getElementById('pubLimit').value) || 0;
-
-            if(!subj || !cls) { alert("Subject and Class are required."); return; }
-
-            // Get questions from Bank
-            const bank = await (await fetch(API + '/bank')).json();
-            if(bank.length === 0) { alert("Question Bank is empty! Add questions first."); return; }
-
-            // Random Selection
-            let selectedQs = bank;
-            if(limit > 0 && bank.length > limit) {
-                selectedQs = bank.sort(() => Math.random() - 0.5).slice(0, limit);
-            }
-
-            const paper = { subject: subj, classGrade: cls, duration: dur, questions: selectedQs };
-            
-            await fetch(API + '/papers', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify(paper)
-            });
-
-            alert(`✅ Exam Published for ${subj} (${cls})\nQuestions: ${selectedQs.length}`);
-        }
-
-        // Admin Helpers
-        async function addStudent() { await fetch(API+'/users', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:document.getElementById('newUid').value, password:document.getElementById('newPass').value})}); loadStudents(); }
-        async function loadStudents() { const d = await (await fetch(API+'/users')).json(); document.getElementById('studentList').innerHTML = d.map(u => `<div style="padding:5px; border-bottom:1px solid #eee;">${u.username} <button class="btn-danger" style="float:right; padding:2px 10px;" onclick="delUser('${u.username}')">X</button></div>`).join(''); }
-        async function delUser(id) { if(confirm('Delete?')) await fetch(API+'/users/'+id, {method:'DELETE'}); loadStudents(); }
-        
-        async function loadBank() { const d = await (await fetch(API+'/bank')).json(); document.getElementById('bankList').innerHTML = d.map(q => `<div>[${q.subject||'Gen'}] ${q.text}</div>`).join(''); }
-        async function bulkImport(inp) { 
-            const reader = new FileReader(); reader.onload = async (e) => {
-                const res = await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:e.target.result});
-                alert(`Imported ${(await res.json()).count} questions.`); loadBank();
-            }; reader.readAsText(inp.files[0]);
-        }
-        async function addQuestion() {
-            const q = { text:document.getElementById('qText').value, options:{A:document.getElementById('optA').value, B:document.getElementById('optB').value, C:document.getElementById('optC').value, D:document.getElementById('optD').value}, correct:document.getElementById('qCorrect').value };
-            await fetch(API+'/bank/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify([q])});
-            alert("Saved"); loadBank();
-        }
-
-        // Monitoring & Results
-        async function loadMonitor() {
-            const d = await (await fetch(API+'/proctor/sessions')).json();
-            document.getElementById('monitorList').innerHTML = d.map(s => `<div style="padding:10px; border-bottom:1px solid #eee;"><strong>${s.username}</strong> (${s.subject}) - Progress: ${s.progress}% ${s.alerts > 0 ? `<span style="color:red; font-weight:bold;">(Violations: ${s.alerts})</span>` : ''}</div>`).join('');
-        }
-        async function loadResults() {
-            const d = await (await fetch(API+'/results')).json();
-            document.getElementById('resultList').innerHTML = d.map(r => `<tr><td>${r.studentName}</td><td>${r.subject}</td><td><b>${r.score}</b></td><td>${r.timestamp}</td></tr>`).join('');
-        }
-
-        // Navigation
+        // --- HELPERS ---
         function showView(v) { ['viewLogin','viewAdmin','viewPreview','viewExam'].forEach(x => document.getElementById(x).classList.add('hidden')); document.getElementById(v).classList.remove('hidden'); }
-        function switchTab(t) { 
-            clearInterval(monitorInt);
-            ['tabCreate','tabStudents','tabMonitor','tabResults'].forEach(x => document.getElementById(x).classList.add('hidden'));
-            document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
-            if(t==='students') loadStudents(); if(t==='results') loadResults(); if(t==='monitor') { loadMonitor(); monitorInt = setInterval(loadMonitor, 5000); }
-        }
+        function switchTab(t) { ['tabCreate','tabStudents','tabResults'].forEach(x => document.getElementById(x).classList.add('hidden')); document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); if(t==='students') loadUsers(); if(t==='results') loadResults(); }
+        async function loadUsers() { const d = await (await fetch(API+'/users')).json(); document.getElementById('studentList').innerHTML = d.map(u => `<div>${u.username} <button onclick="delUser('${u.username}')" class="btn-danger btn-sm">X</button></div>`).join(''); }
+        async function addStudent() { await fetch(API+'/users', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:document.getElementById('newUid').value, password:document.getElementById('newPass').value})}); loadUsers(); }
+        async function delUser(id) { await fetch(API+'/users/'+id, {method:'DELETE'}); loadUsers(); }
+        async function loadResults() { const d = await (await fetch(API+'/results')).json(); document.getElementById('resultList').innerHTML = d.map(r => `<tr><td>${r.studentName}</td><td>${r.subject}</td><td>${r.score}</td><td>${r.timestamp}</td></tr>`).join(''); }
     </script>
 </body>
 </html>

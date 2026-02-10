@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viswam Edutech Pro v6.0</title>
+    <style>
+        :root {
+            --primary: #2d7a8a; --dark: #1a5a66; --bg: #f4f7f8;
+            --success: #27ae60; --danger: #e74c3c; --border: #cbd5e0;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; color: #2d3748; }
+        .hidden { display: none !important; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        header { background: linear-gradient(135deg, var(--primary), var(--dark)); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .nav-tabs { display: flex; gap: 5px; margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tab-btn { padding: 12px 20px; border: none; background: none; cursor: pointer; font-weight: 600; border-radius: 6px; color: #718096; transition: 0.2s; }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+
+        .bank-list { max-height: 450px; overflow-y: auto; border: 1px solid #edf2f7; border-radius: 8px; }
+        .bank-item { padding: 15px; border-bottom: 1px solid #edf2f7; display: flex; justify-content: space-between; align-items: center; }
+        .bank-item:hover { background: #f7fafc; }
+
+        #paperPreview { background: white; padding: 50px; border: 1px solid #ccc; max-width: 800px; margin: 0 auto; line-height: 1.6; color: #000; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .paper-header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
+        .timer-banner { position: sticky; top: 0; background: #2c3e50; color: white; padding: 15px; text-align: center; font-size: 1.2rem; font-weight: bold; z-index: 1000; }
+
+        @media print {
+            .nav-tabs, .btn, .no-print, header { display: none !important; }
+            body { background: white; }
+            #paperPreview { border: none; width: 100%; max-width: 100%; padding: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen" class="container" style="max-width: 400px; margin-top: 15vh;">
+        <div class="card" style="text-align: center;">
+            <h2 style="color: var(--primary); margin-bottom: 20px;">Viswam Exam Engine</h2>
+            <input type="text" id="loginID" placeholder="User ID">
+            <input type="password" id="loginPass" placeholder="Password">
+            <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="handleLogin()">Login to Portal</button>
+        </div>
+    </div>
+
+    <div id="adminApp" class="container hidden">
+        <header>
+            <div>
+                <h1 style="margin:0">Admin Control Center</h1>
+                <span>LAN Examination & Database Management</span>
+            </div>
+            <button class="btn btn-danger" onclick="location.reload()">System Logout</button>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('tabUsers')">User Registry</button>
+            <button class="tab-btn" onclick="switchTab('tabBank')">Bank Manager</button>
+            <button class="tab-btn" onclick="switchTab('tabDraft')">Draft & Preview</button>
+            <button class="tab-btn" onclick="switchTab('tabResults')">Gradebook</button>
+        </div>
+
+        <div id="tabUsers" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <h3>Register Student Account</h3>
+                    <input type="text" id="sName" placeholder="Full Name">
+                    <input type="text" id="sID" placeholder="New Student ID">
+                    <input type="text" id="sPass" placeholder="Access Password">
+                    <button class="btn btn-success" onclick="saveUser()">Register Student</button>
+                </div>
+                <div class="card">
+                    <h3>Current Student Database</h3>
+                    <div id="userList" class="bank-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabBank" class="tab-content hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Central Question Bank</h3>
+                    <input type="file" id="bulkFile" style="display:none" onchange="importJSON(this)">
+                    <button class="btn btn-primary" onclick="document.getElementById('bulkFile').click()">📥 Bulk Import (.json)</button>
+                </div>
+                <div id="bankManagerList" class="bank-list"></div>
+            </div>
+        </div>
+
+        <div id="tabDraft" class="tab-content hidden">
+            <div class="grid">
+                <div class="card no-print">
+                    <h3>Exam Drafting Tool</h3>
+                    <input type="text" id="examTitleInput" placeholder="Exam Name (e.g. Science Midterm)">
+                    <input type="text" id="classInput" placeholder="Class / Grade">
+                    <input type="text" id="sectionInput" placeholder="Section">
+                    <input type="text" id="logoUrlInput" placeholder="Logo URL (e.g. https://yoursite.com/logo.png)">
+                    
+                    <h4 style="margin: 15px 0 5px 0;">Select Questions:</h4>
+                    <div id="draftSelectionList" class="bank-list" style="height: 250px;"></div>
+                    <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="renderDraft()">Generate Preview</button>
+                    <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="window.print()">Print Paper / PDF</button>
+                </div>
+
+                <div id="paperPreview">
+                    <div class="paper-header">
+                        <div id="logoPreview" style="margin-bottom: 10px;"></div>
+                        <h2 style="margin:0; text-transform: uppercase;">Viswam Edutech Institute</h2>
+                        <h3 id="prevTitle" style="margin:0; font-weight:normal;">Official Examination Paper</h3>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #000; padding-bottom:5px; margin-bottom:20px;">
+                        <span><b>Class:</b> <span id="prevClass">--</span></span>
+                        <span><b>Section:</b> <span id="prevSection">--</span></span>
+                        <span><b>Max Marks:</b> <span id="prevMarks">0</span></span>
+                    </div>
+                    <div id="prevBody"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabResults" class="tab-content hidden">
+            <div class="card">
+                <h3>Live Results Stream</h3>
+                <table width="100%" id="resTable" style="border-collapse: collapse;">
+                    <thead><tr style="text-align:left; border-bottom: 2px solid #eee;">
+                        <th style="padding:10px;">ID</th><th>Name</th><th>Score</th><th>Date/Time</th>
+                    </tr></thead>
+                    <tbody id="resBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="studentApp" class="hidden">
+        <div id="timerBanner" class="timer-banner">Time Remaining: --:--</div>
+        <div class="container">
+            <header>
+                <h1 id="sExamTitle">Competitive Examination</h1>
+                <p id="sWelcome"></p>
+            </header>
+            <div id="sTestArea"></div>
+            <button class="btn btn-success" style="width:100%; padding:20px; font-size:1.4rem;" onclick="submitExam()">Submit My Answers</button>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://' + window.location.hostname + ':3000/api';
+        let allQuestions = [];
+        let selectedForDraft = new Set();
+        let currentUser = null;
+        let examTimer;
+
+        async function handleLogin() {
+            const id = document.getElementById('loginID').value;
+            const pw = document.getElementById('loginPass').value;
+            if(id === 'admin' && pw === 'Viswam@2026') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminApp').classList.remove('hidden');
+                refreshData();
+            } else {
+                const res = await fetch(`${API}/users`);
+                const users = await res.json();
+                const user = users.find(u => u.username === id && u.password === pw);
+                if(user) {
+                    currentUser = user;
+                    startStudentExam();
+                } else alert("Invalid Credentials");
+            }
+        }
+
+        function switchTab(t) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(t).classList.remove('hidden');
+            event.target.classList.add('active');
+            if(t === 'tabResults') loadResults();
+        }
+
+        async function refreshData() {
+            const resQ = await fetch(`${API}/bank`);
+            allQuestions = await resQ.json();
+            
+            // Render Bank Manager (Delete Logic)
+            document.getElementById('bankManagerList').innerHTML = allQuestions.map(q => `
+                <div class="bank-item">
+                    <div style="flex-grow:1"><b>Q:</b> ${q.text}</div>
+                    <button class="btn btn-danger" style="padding:5px 10px" onclick="deleteQuestion('${q.id}')">Delete</button>
+                </div>
+            `).join('');
+
+            // Render Drafting Selector
+            document.getElementById('draftSelectionList').innerHTML = allQuestions.map(q => `
+                <div class="bank-item">
+                    <input type="checkbox" onchange="toggleDraftSelection('${q.id}')">
+                    <div style="margin-left:10px">${q.text.substring(0,80)}...</div>
+                </div>
+            `).join('');
+            
+            // Render User Registry
+            const resU = await fetch(`${API}/users`);
+            const users = await resU.json();
+            document.getElementById('userList').innerHTML = users.map(u => `
+                <div class="bank-item">
+                    <span><b>${u.username}</b> - ${u.fullName}</span>
+                </div>
+            `).join('');
+        }
+
+        async function deleteQuestion(id) {
+            if(!confirm("Permanently delete this question from database?")) return;
+            const res = await fetch(`${API}/bank/${id}`, { method: 'DELETE' });
+            if(res.ok) {
+                alert("Deleted successfully");
+                refreshData();
+            } else alert("Failed to delete");
+        }
+
+        function toggleDraftSelection(id) {
+            if(selectedForDraft.has(id)) selectedForDraft.delete(id);
+            else selectedForDraft.add(id);
+        }
+
+        function renderDraft() {
+            const qs = allQuestions.filter(q => selectedForDraft.has(String(q.id)));
+            document.getElementById('prevTitle').innerText = document.getElementById('examTitleInput').value || "Official Examination Paper";
+            document.getElementById('prevClass').innerText = document.getElementById('classInput').value || "--";
+            document.getElementById('prevSection').innerText = document.getElementById('sectionInput').value || "--";
+            document.getElementById('prevMarks').innerText = qs.length;
+            
+            const logoUrl = document.getElementById('logoUrlInput').value;
+            document.getElementById('logoPreview').innerHTML = logoUrl ? `<img src="${logoUrl}" style="max-height:80px">` : '';
+
+            document.getElementById('prevBody').innerHTML = qs.map((q, i) => `
+                <div style="margin-bottom:20px">
+                    <div style="font-weight:600">Q${i+1}. ${q.text}</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; margin-left:25px; margin-top:5px;">
+                        <span>(A) ${q.options.A}</span><span>(B) ${q.options.B}</span>
+                        <span>(C) ${q.options.C}</span><span>(D) ${q.options.D}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function saveUser() {
+            const u = { 
+                username: document.getElementById('sID').value, 
+                fullName: document.getElementById('sName').value, 
+                password: document.getElementById('sPass').value,
+                role: 'student'
+            };
+            await fetch(`${API}/users`, { 
+                method: 'POST', 
+                headers: {'Content-Type':'application/json'}, 
+                body: JSON.stringify(u)
+            });
+            alert("Registration Complete");
+            refreshData();
+        }
+
+        async function importJSON(input) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const data = JSON.parse(e.target.result);
+                // Ensure unique IDs for imported questions
+                const processed = data.map(q => ({ id: Date.now() + Math.random(), ...q }));
+                await fetch(`${API}/bank/bulk`, { 
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify(processed)
+                });
+                alert("Bank Updated Successfully");
+                refreshData();
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        async function startStudentExam() {
+            const res = await fetch(`${API}/bank`);
+            const bank = await res.json();
+            if(bank.length === 0) return alert("Database is empty. Please contact administrator.");
+
+            // Shuffle and pick 20 questions
+            examQuestions = bank.sort(() => 0.5 - Math.random()).slice(0, 20);
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('studentApp').classList.remove('hidden');
+            document.getElementById('sWelcome').innerText = `Student: ${currentUser.fullName} | ID: ${currentUser.username}`;
+            
+            document.getElementById('sTestArea').innerHTML = examQuestions.map((q, i) => `
+                <div class="card" style="border-left: 6px solid var(--primary)">
+                    <p><b>Question ${i+1}:</b> ${q.text}</p>
+                    <div style="margin-left: 10px;">
+                        ${['A','B','C','D'].map(opt => `
+                            <label style="display:block; padding:8px; cursor:pointer;">
+                                <input type="radio" name="q${i}" value="${opt}"> ${opt}) ${q.options[opt]}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            let time = 30 * 60; // 30 Minutes
+            examTimer = setInterval(() => {
+                let m = Math.floor(time / 60);
+                let s = time % 60;
+                document.getElementById('timerBanner').innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+                if(time-- <= 0) { clearInterval(examTimer); submitExam(); }
+            }, 1000);
+        }
+
+        async function submitExam() {
+            clearInterval(examTimer);
+            let score = 0;
+            examQuestions.forEach((q, i) => {
+                const ans = document.querySelector(`input[name="q${i}"]:checked`)?.value;
+                if(ans === q.correct) score++;
+            });
+
+            const result = {
+                studentID: currentUser.username,
+                studentName: currentUser.fullName,
+                score: `${score}/${examQuestions.length}`,
+                timestamp: new Date().toLocaleString()
+            };
+
+            await fetch(`${API}/submit`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(result)
+            });
+
+            document.getElementById('studentApp').innerHTML = `
+                <div class="container" style="text-align:center; padding-top:10vh;">
+                    <div class="card">
+                        <h1 style="color:var(--success)">Submission Complete</h1>
+                        <p style="font-size:1.5rem">Your Score: ${result.score}</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Back to Main Screen</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadResults() {
+            const res = await fetch(`${API}/results`);
+            const data = await res.json();
+            document.getElementById('resBody').innerHTML = data.reverse().map(r => `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding:10px;">${r.studentID}</td>
+                    <td>${r.studentName}</td>
+                    <td><b>${r.score}</b></td>
+                    <td style="font-size:0.9em; color:#666;">${r.timestamp}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
